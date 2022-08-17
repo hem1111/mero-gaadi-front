@@ -1,0 +1,16 @@
+{
+    "name": "mero-gaadi",
+    "private": true,
+    "version": "1.0.0",
+    "devDependencies": {
+        "lerna": "^4.0.0"
+    },
+    "scripts": {
+        "start": "lerna run start",
+        "package:owner-dashboard": "lerna run start --scope=owner-dashboard"
+    },
+    "dependencies": {
+        "axios": "^0.24.0",
+        "create-react-app": "^5.0.1"
+    }
+}
