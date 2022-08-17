@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Layout, Menu } from "antd";
-import { UserOutlined, HomeOutlined, LogoutOutlined } from "@ant-design/icons";
+import { UserOutlined, CarOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../utils/AuthContext";
 import { createUseStyles } from "react-jss";
@@ -21,13 +21,13 @@ const Sidebar = ({ defaultKey }) => {
   const classes = useStyles();
   const nav = useNavigate();
 
-  const { setUserId, setAuthenticated } = useContext(AuthContext);
+  const { setOwnerId, setAuthenticated } = useContext(AuthContext);
 
   const handleLogout = () => {
     localStorage.removeItem("ownerToken");
-    setUserId("");
+    setOwnerId("");
     setAuthenticated(false);
-    nav("/");
+    nav("/login");
   };
 
   return (
@@ -42,10 +42,10 @@ const Sidebar = ({ defaultKey }) => {
         </Menu.Item>
         <Menu.Item
           key="2"
-          icon={<HomeOutlined />}
-          onClick={() => nav("/rooms")}
+          icon={<CarOutlined />}
+          onClick={() => nav("/vehicles")}
         >
-          My Rooms
+          My Vehicles
         </Menu.Item>
         <Menu.Item key="3" icon={<LogoutOutlined />} onClick={handleLogout}>
           Logout

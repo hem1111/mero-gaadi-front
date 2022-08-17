@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Layout } from "antd";
 import { createUseStyles } from "react-jss";
 import { useLocation } from "react-router-dom";
 import { Sidebar } from "../dashboard-layouts/Sidebar";
 import { HeaderLayout } from "../dashboard-layouts/Header";
 import { ownerRoutes } from "../../utils/Routes";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../../utils/AuthContext";
 
 const { Content } = Layout;
 
@@ -27,11 +29,17 @@ export default function Dashboard() {
   const [page, setPage] = useState("/");
   const [defaultKey, setDefaultKey] = useState("");
 
+  const { authenticated } = useContext(AuthContext);
+
   useEffect(() => {
     setPage(location.pathname);
     if (location.pathname.startsWith("/profile")) setDefaultKey("1");
     else setDefaultKey("2");
   }, [location]);
+
+  if (!authenticated) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <Layout className={classes.roomie}>

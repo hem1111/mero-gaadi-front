@@ -6,16 +6,12 @@ import {
   Input,
   Button,
   Divider,
-  Switch,
-  Row,
-  Col,
   notification,
   Upload,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
-import TextArea from "antd/lib/input/TextArea";
 
 const useStyles = createUseStyles(() => {
   return {
@@ -49,43 +45,26 @@ const Vehicle = () => {
   const [imageURL, setImageURL] = useState(null);
 
   const [form] = Form.useForm();
-  const [facilities, setFacilities] = useState({
-    inRent: false,
-    negotiable: false,
-    water: false,
-    internet: false,
-    parking: false,
-    terrace: false,
-  });
 
   useEffect(() => {
     if (id) {
-      getRoomDetails();
+      getVehicleDetails();
     }
   }, [id]);
 
-  const getRoomDetails = async () => {
+  const getVehicleDetails = async () => {
     var token = localStorage.getItem("ownerToken");
     await axios
-      .get(`${process.env.REACT_APP_API_URL}/rooms/${id}`, {
+      .get(`${process.env.REACT_APP_API_URL}/vehicles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         let data = res?.data?.data;
         if (data) {
           form.setFieldsValue({
-            location: data?.location,
-            numberOfRooms: data?.numberOfRooms,
-            pricePerRoom: data?.pricePerRoom,
-            description: data?.description,
-          });
-          setFacilities({
-            inRent: data?.inRent,
-            negotiable: data?.negotiable,
-            water: data?.water,
-            internet: data?.internet,
-            parking: data?.parking,
-            terrace: data.terrace,
+            type: data?.type,
+            number: data?.number,
+            currentDriver: data?.currentDriver,
           });
           if (data?.image)
             setImageURL(`${process.env.REACT_APP_API_URL}/${data?.image}`);
@@ -105,16 +84,9 @@ const Vehicle = () => {
 
   const onSubmitForm = (values) => {
     const formData = new FormData();
-    formData.append("inRent", facilities.inRent);
-    formData.append("location", values.location);
-    formData.append("numberOfRooms", values.numberOfRooms);
-    formData.append("pricePerRoom", values.pricePerRoom);
-    formData.append("description", values.description);
-    formData.append("negotiable", facilities.negotiable);
-    formData.append("water", facilities.water);
-    formData.append("internet", facilities.internet);
-    formData.append("parking", facilities.parking);
-    formData.append("terrace", facilities.terrace);
+    formData.append("type", values.type);
+    formData.append("number", values.number);
+    formData.append("currentDriver", values.currentDriver);
     formData.append("file", file);
 
     var token = localStorage.getItem("ownerToken");
@@ -128,16 +100,16 @@ const Vehicle = () => {
     if (id) {
       axios
         .put(
-          `${process.env.REACT_APP_API_URL}/rooms/${id}`,
+          `${process.env.REACT_APP_API_URL}/vehicles/${id}`,
           formData,
           reqHeader
         )
         .then(() => {
           notification["success"]({
             message: "Success",
-            description: "Room updated",
+            description: "Vehicle updated",
           });
-          nav("/rooms");
+          nav("/vehicles");
         })
         .catch((err) => {
           let message = "Something is wrong! Please try again later.";
@@ -151,13 +123,13 @@ const Vehicle = () => {
         });
     } else {
       axios
-        .post(`${process.env.REACT_APP_API_URL}/rooms`, formData, reqHeader)
+        .post(`${process.env.REACT_APP_API_URL}/vehicles`, formData, reqHeader)
         .then(() => {
           notification["success"]({
             message: "Success",
-            description: "Room added",
+            description: "Vehicle added",
           });
-          nav("/rooms");
+          nav("/vehicles");
         })
         .catch((err) => {
           let message = "Something is wrong! Please try again later.";
@@ -186,9 +158,9 @@ const Vehicle = () => {
       <Typography className={classes.title}>
         <ArrowLeftOutlined
           className={classes.backArrow}
-          onClick={() => nav("/rooms")}
+          onClick={() => nav("/vehicles")}
         />
-        {id ? "Edit Room" : "Add Room"}
+        {id ? "Edit Vehicle" : "Add Vehicle"}
       </Typography>
       <Divider />
       <Form
@@ -202,22 +174,10 @@ const Vehicle = () => {
         autoComplete="off"
         className={classes.form}
       >
-        <Form.Item label="For Rent">
-          <Switch
-            checked={facilities.inRent}
-            onChange={(value) => {
-              setFacilities({
-                ...facilities,
-                inRent: value,
-              });
-            }}
-          />
-        </Form.Item>
-
         <Form.Item
-          id="location"
-          label="Location"
-          name="location"
+          id="type"
+          label="Vehicle Type"
+          name="type"
           rules={[
             {
               required: true,
@@ -225,12 +185,12 @@ const Vehicle = () => {
             },
           ]}
         >
-          <Input name="location" />
+          <Input name="type" />
         </Form.Item>
 
         <Form.Item
-          label="Number of Rooms"
-          name="numberOfRooms"
+          label="Number"
+          name="number"
           rules={[
             {
               required: true,
@@ -238,12 +198,12 @@ const Vehicle = () => {
             },
           ]}
         >
-          <Input type="number" min={1} />
+          <Input name="number" />
         </Form.Item>
 
         <Form.Item
-          label="Price per Room"
-          name="pricePerRoom"
+          label="Current Driver"
+          name="currentDriver"
           rules={[
             {
               required: true,
@@ -251,85 +211,7 @@ const Vehicle = () => {
             },
           ]}
         >
-          <Input type="number" min={1} />
-        </Form.Item>
-
-        <Row>
-          <Col span={9}>
-            <Form.Item label="Negotiable">
-              <Switch
-                checked={facilities.negotiable}
-                onChange={(value) => {
-                  setFacilities({
-                    ...facilities,
-                    negotiable: value,
-                  });
-                }}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={8}>
-            <Form.Item label="Water">
-              <Switch
-                checked={facilities.water}
-                onChange={(value) => {
-                  setFacilities({
-                    ...facilities,
-                    water: value,
-                  });
-                }}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={7}>
-            <Form.Item label="Internet">
-              <Switch
-                checked={facilities.internet}
-                onChange={(value) => {
-                  setFacilities({
-                    ...facilities,
-                    internet: value,
-                  });
-                }}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={9}>
-            <Form.Item label="Parking">
-              <Switch
-                checked={facilities.parking}
-                onChange={(value) => {
-                  setFacilities({
-                    ...facilities,
-                    parking: value,
-                  });
-                }}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={8}>
-            <Form.Item label="Terrace">
-              <Switch
-                checked={facilities.terrace}
-                onChange={(value) => {
-                  setFacilities({
-                    ...facilities,
-                    terrace: value,
-                  });
-                }}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item id="description" label="Description" name="description">
-          <TextArea name="description" rows={3} />
+          <Input name="currentDriver" />
         </Form.Item>
 
         <Form.Item label="Image">

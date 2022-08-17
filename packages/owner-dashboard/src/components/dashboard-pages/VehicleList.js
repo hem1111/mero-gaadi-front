@@ -35,21 +35,21 @@ const useStyles = createUseStyles(() => {
   };
 });
 
-const RoomsList = () => {
+const VehicleList = () => {
   const classes = useStyles();
   const nav = useNavigate();
 
-  const [rooms, setRooms] = useState({});
+  const [vehicles, setVehicles] = useState({});
   const [reload, setReload] = useState("");
 
   useEffect(() => {
     var token = localStorage.getItem("ownerToken");
     axios
-      .get(`${process.env.REACT_APP_API_URL}/rooms`, {
+      .get(`${process.env.REACT_APP_API_URL}/vehicles`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setRooms(res?.data);
+        setVehicles(res?.data);
       })
       .catch((err) => {
         let message = "Something is wrong! Please try again later.";
@@ -63,15 +63,15 @@ const RoomsList = () => {
       });
   }, [reload]);
 
-  const deleteRoom = (id) => {
+  const deleteVehicle = (id) => {
     var token = localStorage.getItem("ownerToken");
     axios
-      .delete(`${process.env.REACT_APP_API_URL}/rooms/${id}`, {
+      .delete(`${process.env.REACT_APP_API_URL}/vehicles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
         notification["success"]({
-          description: "Room has been removed",
+          description: "Vehicle has been removed",
         });
         setReload(id);
       })
@@ -89,19 +89,16 @@ const RoomsList = () => {
 
   const columns = [
     {
-      title: "Location",
-      dataIndex: "location",
-      key: "location",
+      title: "Vehicle Type",
+      dataIndex: "type",
     },
     {
-      title: "Number of Rooms",
-      dataIndex: "numberOfRooms",
-      key: "numberOfRooms",
+      title: "Vehicle Number",
+      dataIndex: "number",
     },
     {
-      title: "Price per Room",
-      dataIndex: "pricePerRoom",
-      key: "pricePerRoom",
+      title: "Driver",
+      dataIndex: "currentDriver",
     },
     {
       title: "Action",
@@ -111,14 +108,14 @@ const RoomsList = () => {
         <div className={classes.actionWrapper}>
           <Typography
             className={classes.editAction}
-            onClick={() => nav(`/rooms/edit/${record._id}`)}
+            onClick={() => nav(`/vehicles/edit/${record._id}`)}
           >
             <EditOutlined className={classes.icon} />
             Edit
           </Typography>
           <Typography
             className={classes.deleteAction}
-            onClick={() => deleteRoom(record._id)}
+            onClick={() => deleteVehicle(record._id)}
           >
             <DeleteOutlined className={classes.icon} />
             Delete
@@ -131,23 +128,23 @@ const RoomsList = () => {
   return (
     <>
       <div className={classes.titleWrapper}>
-        <Typography className={classes.title}>List of Rooms</Typography>
-        <Button type="primary" onClick={() => nav("/rooms/add")}>
-          Add Room
+        <Typography className={classes.title}>List of vehicles</Typography>
+        <Button type="primary" onClick={() => nav("/vehicles/add")}>
+          Add Vehicle
         </Button>
       </div>
       <Table
         columns={columns}
-        dataSource={rooms?.data || []}
+        dataSource={vehicles?.data || []}
         rowKey="_id"
         pagination={{
           position: ["bottomCenter"],
           showSizeChanger: false,
-          total: rooms?.data?.length,
+          total: vehicles?.data?.length,
         }}
       />
     </>
   );
 };
 
-export { RoomsList };
+export { VehicleList };
