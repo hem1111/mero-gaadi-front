@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import {
   Col,
@@ -9,12 +9,9 @@ import {
   Button,
   notification,
   Form,
-  Modal,
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../utils/AuthContext";
 
 const useStyles = createUseStyles(() => {
   return {
@@ -40,24 +37,22 @@ const useStyles = createUseStyles(() => {
 
 const ProfileContent = () => {
   const classes = useStyles();
-  const nav = useNavigate();
-  const { userId, setUserId, setAuthenticated } = useContext(AuthContext);
 
   const [user, setUser] = useState({
     name: "",
     email: "",
-    password: "********",
+    address: "",
     contactNumber: "",
   });
   const [editName, setEditName] = useState(false);
   const [editContact, setEditContact] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [editAddress, setEditAddress] = useState(false);
 
   useEffect(() => {
     var token = localStorage.getItem("ownerToken");
 
     axios
-      .get(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
+      .get(`${process.env.REACT_APP_API_URL}/owners`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -65,6 +60,7 @@ const ProfileContent = () => {
           ...user,
           name: res.data.data.name,
           email: res.data.data.email,
+          address: res.data.data.address || "",
           contactNumber: res.data.data?.contactNumber || "",
         });
       })
@@ -86,10 +82,12 @@ const ProfileContent = () => {
       body = { name: user.name };
     } else if (editContact) {
       body = { contactNumber: user.contactNumber };
+    } else if (editAddress) {
+      body = { address: user.address };
     }
     var token = localStorage.getItem("ownerToken");
     axios
-      .post(`${process.env.REACT_APP_API_URL}/users/${userId}`, body, {
+      .put(`${process.env.REACT_APP_API_URL}/owners/update`, body, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -111,35 +109,8 @@ const ProfileContent = () => {
         });
       });
     setEditName(false);
+    setEditAddress(false);
     setEditContact(false);
-  };
-
-  const handleDeactivateAccount = () => {
-    var token = localStorage.getItem("ownerToken");
-    axios
-      .delete(`${process.env.REACT_APP_API_URL}/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        notification["success"]({
-          message: "Deactivated",
-          description: "Your account has been deactivated",
-        });
-        localStorage.removeItem("ownerToken");
-        setUserId("");
-        setAuthenticated(false);
-        nav("/login");
-      })
-      .catch((err) => {
-        let message = "Something is wrong! Please try again later.";
-        if (err.response.data.status < 500) {
-          message = err.response.data.error;
-        }
-        notification["error"]({
-          message: "Error Occured",
-          description: message,
-        });
-      });
   };
 
   return (
@@ -192,6 +163,7 @@ const ProfileContent = () => {
             ) : (
               <EditOutlined
                 onClick={() => {
+                  setEditAddress(false);
                   setEditContact(false);
                   setEditName(true);
                 }}
@@ -200,8 +172,75 @@ const ProfileContent = () => {
           </Col>
         </Row>
       </Form>
-
       <Divider />
+
+      <Row gutter={16}>
+        <Col span={8} className={classes.label}>
+          Email
+        </Col>
+        <Col span={12} className={classes.info}>
+          {user.email}
+        </Col>
+      </Row>
+      <Divider />
+
+      <Form onFinish={handleUpdateProfile}>
+        <Row gutter={16}>
+          <Col span={8} className={classes.label}>
+            Address
+          </Col>
+
+          <Col span={12} className={classes.info}>
+            {editAddress ? (
+              <Form.Item
+                name="address"
+                rules={[
+                  {
+                    required: true,
+                    message: "Required",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Enter address"
+                  value={user.address}
+                  onChange={(event) => {
+                    const { value } = event.target;
+                    setUser({ ...user, address: value });
+                  }}
+                />
+              </Form.Item>
+            ) : (
+              <>{user.address}</>
+            )}
+          </Col>
+
+          <Col span={4} className={classes.editBtn}>
+            {editAddress ? (
+              <>
+                <Button
+                  type="primary"
+                  className={classes.updateBtn}
+                  htmlType="submit"
+                >
+                  Update
+                </Button>
+                <Button onClick={() => setEditAddress(false)}>Cancel</Button>
+              </>
+            ) : (
+              <EditOutlined
+                onClick={() => {
+                  setEditAddress(true);
+                  setEditContact(false);
+                  setEditName(false);
+                }}
+              />
+            )}
+          </Col>
+        </Row>
+      </Form>
+      <Divider />
+
       <Form onFinish={handleUpdateProfile}>
         <Row gutter={16}>
           <Col span={8} className={classes.label}>
@@ -243,56 +282,21 @@ const ProfileContent = () => {
                 >
                   Update
                 </Button>
-                <Button onClick={() => setEditName(false)}>Cancel</Button>
+                <Button onClick={() => setEditContact(false)}>Cancel</Button>
               </>
             ) : (
               <EditOutlined
                 onClick={() => {
                   setEditName(false);
                   setEditContact(true);
+                  setEditAddress(false);
                 }}
               />
             )}
           </Col>
         </Row>
       </Form>
-
       <Divider />
-      <Row gutter={16}>
-        <Col span={8} className={classes.label}>
-          Email
-        </Col>
-        <Col span={12} className={classes.info}>
-          {user.email}
-        </Col>
-      </Row>
-      <Divider />
-      <Row gutter={16}>
-        <Col span={8} className={classes.label}>
-          Password
-        </Col>
-        <Col span={12} className={classes.info}>
-          {user.password}
-        </Col>
-      </Row>
-      <Divider />
-
-      <Button danger onClick={() => setShowModal(true)}>
-        Deactivate account
-      </Button>
-      <Modal
-        title="Are you sure you want to deactivate your account?"
-        visible={showModal}
-        onOk={handleDeactivateAccount}
-        onCancel={() => setShowModal(false)}
-        okText="Deactivate"
-      >
-        <p>
-          After your account is deactivated. You will no longer able to login
-          into the roomie and also all the information related you will get
-          deleted.
-        </p>
-      </Modal>
     </>
   );
 };

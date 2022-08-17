@@ -67,13 +67,13 @@ export default function ForgotPassword() {
     return <Spin size="large" />;
   }
 
-  //   if (authenticated) {
-  //     return <Navigate to="/profile" />;
-  //   }
+  if (authenticated) {
+    return <Navigate to="/profile" />;
+  }
 
   const onFinish = (values) => {
     axios
-      .post(`${process.env.REACT_APP_API_URL}/forgot-password`, {
+      .post(`${process.env.REACT_APP_API_URL}/owners/forgot-password`, {
         email: values.email,
         password: values.password,
       })

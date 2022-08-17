@@ -65,7 +65,7 @@ export default function SignUp() {
 
   const onFinish = (values) => {
     axios
-      .post(`${process.env.REACT_APP_API_URL}/create-owner`, {
+      .post(`${process.env.REACT_APP_API_URL}/owners/signup`, {
         name: values.name,
         email: values.email,
         password: values.password,
