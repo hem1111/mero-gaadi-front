@@ -3,7 +3,7 @@ import { createUseStyles } from "react-jss";
 import { Button, Table, Typography, notification } from "antd";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
 const useStyles = createUseStyles(() => {
   return {
@@ -31,6 +31,13 @@ const useStyles = createUseStyles(() => {
     },
     icon: {
       marginRight: 5,
+    },
+    viewIcon: {
+      cursor: "pointer",
+      position: "absolute",
+      left: "40px",
+      top: "15px",
+      fontSize: 24,
     },
   };
 });
@@ -88,6 +95,17 @@ const VehicleList = () => {
   };
 
   const columns = [
+    {
+      title: "View Details",
+      dataIndex: "view",
+      width: 120,
+      render: (text, record) => (
+        <EyeOutlined
+          className={classes.viewIcon}
+          onClick={() => nav(`/vehicles/view/${record._id}`)}
+        />
+      ),
+    },
     {
       title: "Vehicle Type",
       dataIndex: "type",

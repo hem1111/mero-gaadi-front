@@ -8,6 +8,7 @@ import { ownerRoutes } from "../../utils/Routes";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../utils/AuthContext";
 import { Vehicle } from "../dashboard-pages/Vehicle";
+import { VehicleDetails } from "../dashboard-pages/VehicleDetails";
 
 const { Content } = Layout;
 
@@ -54,6 +55,12 @@ export default function Dashboard() {
               page.startsWith("/vehicles/edit/")
             ) {
               return <Vehicle />;
+            }
+            if (
+              item.key.startsWith("/vehicles/view/") &&
+              page.startsWith("/vehicles/view/")
+            ) {
+              return <VehicleDetails />;
             }
             if (item.key === page) {
               return item.page;

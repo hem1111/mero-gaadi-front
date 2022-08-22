@@ -4,6 +4,7 @@ import Login from "../components/auth-pages/Login";
 import SignUp from "../components/auth-pages/SignUp";
 import { ProfileContent } from "../components/dashboard-pages/Profile";
 import { Vehicle } from "../components/dashboard-pages/Vehicle";
+import { VehicleDetails } from "../components/dashboard-pages/VehicleDetails";
 import { VehicleList } from "../components/dashboard-pages/VehicleList";
 
 export const routes = [
@@ -17,4 +18,5 @@ export const ownerRoutes = [
   { key: "/vehicles", page: <VehicleList /> },
   { key: "/vehicles/add", page: <Vehicle /> },
   { key: "/vehicles/edit/:id", page: <Vehicle /> },
+  { key: "/vehicles/view/:id", page: <VehicleDetails /> },
 ];
