@@ -7,6 +7,7 @@ import { HeaderLayout } from "../dashboard-layouts/Header";
 import { ownerRoutes } from "../../utils/Routes";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../utils/AuthContext";
+import { Vehicle } from "../dashboard-pages/Vehicle";
 
 const { Content } = Layout;
 
@@ -48,6 +49,12 @@ export default function Dashboard() {
         <Sidebar defaultKey={defaultKey} />
         <Content className={classes.contentWrapper}>
           {ownerRoutes.map((item) => {
+            if (
+              item.key.startsWith("/vehicles/edit/") &&
+              page.startsWith("/vehicles/edit/")
+            ) {
+              return <Vehicle />;
+            }
             if (item.key === page) {
               return item.page;
             }

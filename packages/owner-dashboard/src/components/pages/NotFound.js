@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Typography } from "antd";
 import { createUseStyles } from "react-jss";
+import { AuthContext } from "../../utils/AuthContext";
+import { useLocation, Navigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -28,6 +30,17 @@ const useStyles = createUseStyles(() => {
 
 export default function NotFound() {
   const classes = useStyles();
+
+  const { authenticated } = useContext(AuthContext);
+  const location = useLocation();
+
+  if (location.pathname == "/") {
+    if (authenticated) {
+      return <Navigate to="/profile" />;
+    } else {
+      return <Navigate to="/login" />;
+    }
+  }
 
   return (
     <div className={classes.wrapper}>
